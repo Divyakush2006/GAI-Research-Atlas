@@ -1,4 +1,4 @@
-# GAI Research Atlas
+# GovernAI Research Atlas
 
 > Enterprise-grade AI governance intelligence platform — semantic discovery of papers, open-source repositories, and trusted regulatory resources. Built for board-ready reporting and deep research analysis.
 
@@ -37,7 +37,7 @@
 
 ## Overview
 
-**GAI Research Atlas** ingests real-time data from **OpenAlex** (30M+ scholarly works), **GitHub** (repository search), and a curated **governance resources** database to produce a comprehensive intelligence report on any AI governance topic. Results are ranked by a multi-factor scoring algorithm combining semantic relevance, citation impact, recency, and keyword overlap.
+**GovernAI Research Atlas** ingests real-time data from **OpenAlex** (30M+ scholarly works), **GitHub** (repository search), and a curated **governance resources** database to produce a comprehensive intelligence report on any AI governance topic. Results are ranked by a multi-factor scoring algorithm combining semantic relevance, citation impact, recency, and keyword overlap.
 
 The platform is built as a **monorepo** containing a React + TypeScript frontend and a Python + FastAPI backend, communicating over a REST API.
 
@@ -123,7 +123,7 @@ The platform is built as a **monorepo** containing a React + TypeScript frontend
 ## Project Structure
 
 ```
-GAI-Research-Atlas/
+GovernAI-Research-Atlas/
 ├── api_main.py                       # FastAPI entry point (health, atlas, graph endpoints)
 ├── app.py                            # Legacy Streamlit entry point (unused)
 ├── requirements.txt                  # Python dependencies
@@ -233,8 +233,8 @@ The Python backend is cross-platform. On Windows, ensure:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Divyakush2006/GAI-Research-Atlas.git
-cd GAI-Research-Atlas
+git clone https://github.com/Divyakush2006/GovernAI-Research-Atlas.git
+cd GovernAI-Research-Atlas
 ```
 
 ### 2. Frontend Dependencies
@@ -525,7 +525,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 ---
 
 <div align="center">
-  <sub>© 2026 GAI Research Atlas. All rights reserved.</sub>
+  <sub>© 2026 GovernAI Research Atlas. All rights reserved.</sub>
   <br/>
   <sub>Built with ❤️ by <a href="https://github.com/Divyakush2006">Divyakush2006</a></sub>
   <br/>

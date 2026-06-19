@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FileText, Github, Globe, Brain, Layers, Check } from 'lucide-react';
-import { GovernAILogo } from './GovernAILogo';
+import { ImageWithFallback } from './figma/ImageWithFallback';
+import dashLogo from '../../imports/image-removebg-preview.png';
 
 const STEPS = [
   {
@@ -58,7 +59,7 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
   const progress = ((completedSteps.length) / STEPS.length) * 100;
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#FAFAF8] px-6">
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-[#FAFAF8] px-6 overflow-hidden">
       {/* Ambient glow */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -73,7 +74,7 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex justify-center mb-10"
+          className="flex justify-center mb-5"
         >
           <div className="relative">
             {/* Outer pulse ring */}
@@ -91,9 +92,13 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
               style={{ background: 'rgba(241,106,36,0.1)' }}
             />
             <div
-              className="relative w-24 h-24 rounded-full flex items-center justify-center shadow-lg bg-white overflow-hidden"
+              className="relative w-20 h-20 rounded-full flex items-center justify-center shadow-lg bg-white overflow-hidden"
             >
-              <GovernAILogo className="w-16 h-16" />
+              <ImageWithFallback 
+                src={dashLogo} 
+                alt="Research Atlas Logo" 
+                className="w-12 h-12 object-contain"
+              />
             </div>
           </div>
         </motion.div>
@@ -103,14 +108,14 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-center mb-8"
+          className="text-center mb-4"
         >
-          <p className="text-sm text-[#7A7169] mb-2 font-medium uppercase tracking-widest">Generating Atlas for</p>
-          <h2 className="text-2xl font-bold text-[#0D0D0D]">{topic}</h2>
+          <p className="text-xs text-[#7A7169] mb-1 font-medium uppercase tracking-widest">Generating Atlas for</p>
+          <h2 className="text-xl font-bold text-[#0D0D0D]">{topic}</h2>
         </motion.div>
 
         {/* Steps */}
-        <div className="space-y-3 mb-8">
+        <div className="space-y-2 mb-4">
           {STEPS.map((step, index) => {
             const isComplete = completedSteps.includes(index);
             const isActive = activeStep === index && !isComplete;
@@ -122,7 +127,7 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
                 initial={{ opacity: 0, x: -16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.08, duration: 0.4 }}
-                className="flex items-center gap-4 p-4 rounded-xl transition-all duration-500"
+                className="flex items-center gap-3 p-3 rounded-xl transition-all duration-500"
                 style={{
                   background: isActive ? '#FFF4EC' : isComplete ? '#F7F4F0' : 'transparent',
                   border: isActive ? '1px solid #F5D4C0' : '1px solid transparent',
@@ -130,7 +135,7 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
               >
                 {/* Icon container */}
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-500"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-500"
                   style={{
                     background: isComplete
                       ? '#16A34A'
@@ -147,7 +152,7 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
                         animate={{ scale: 1, rotate: 0 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                       >
-                        <Check className="w-5 h-5 text-white" />
+                        <Check className="w-4 h-4 text-white" />
                       </motion.div>
                     ) : (
                       <motion.div key="icon">
@@ -156,11 +161,11 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
                             animate={{ rotate: 360 }}
                             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                           >
-                            <step.icon className="w-5 h-5 text-white" />
+                            <step.icon className="w-4 h-4 text-white" />
                           </motion.div>
                         ) : (
                           <step.icon
-                            className="w-5 h-5 transition-colors duration-300"
+                            className="w-4 h-4 transition-colors duration-300"
                             style={{ color: isPending ? '#B0A99F' : '#F16A24' }}
                           />
                         )}
@@ -172,7 +177,7 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
                 {/* Text */}
                 <div className="flex-1 min-w-0">
                   <p
-                    className="text-sm font-semibold transition-colors duration-300"
+                    className="text-xs font-semibold transition-colors duration-300"
                     style={{
                       color: isComplete ? '#16A34A' : isActive ? '#0D0D0D' : '#B0A99F',
                     }}

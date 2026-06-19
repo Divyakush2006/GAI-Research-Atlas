@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { FileText, Github, Globe, Brain, Layers, Check, Network } from 'lucide-react';
+import { FileText, Github, Globe, Brain, Layers, Check } from 'lucide-react';
+import { GovernAILogo } from './GovernAILogo';
 
 const STEPS = [
   {
@@ -90,10 +91,9 @@ export function LoadingScreen({ topic }: LoadingScreenProps) {
               style={{ background: 'rgba(241,106,36,0.1)' }}
             />
             <div
-              className="relative w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
-              style={{ background: '#F16A24' }}
+              className="relative w-24 h-24 rounded-full flex items-center justify-center shadow-lg bg-white overflow-hidden"
             >
-              <Network className="w-9 h-9 text-white" />
+              <GovernAILogo className="w-16 h-16" />
             </div>
           </div>
         </motion.div>

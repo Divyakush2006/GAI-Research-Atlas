@@ -371,7 +371,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 ---
 
 <div align="center">
-  <sub>Built with React, Vite, and Tailwind CSS</sub>
-  <br/>
   <sub>© 2026 GAI Research Atlas. All rights reserved.</sub>
+  <br/>
+  <sub>Developed with ❤️ by <a href="https://github.com/Divyakush2006">Divyakush2006</a></sub>
 </div>

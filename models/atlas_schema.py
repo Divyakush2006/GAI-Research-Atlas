@@ -7,6 +7,7 @@ class Paper(BaseModel):
     authors: List[str]
     citation_count: int
     abstract: str = ""
+    url: str = ""
 
     score: float = 0.0
 
@@ -16,6 +17,7 @@ class Repository(BaseModel):
     description: str
     stars: int
     url: str
+    score: float = 0.0
 
 class Resource(BaseModel):
     title: str

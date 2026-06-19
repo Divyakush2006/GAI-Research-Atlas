@@ -1,150 +1,344 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20">...</svg>
+# GAI Research Atlas
 
-# GAI Research Atlas — Frontend
+> Enterprise-grade AI governance intelligence platform — semantic discovery of papers, open-source repositories, and trusted regulatory resources. Built for board-ready reporting and deep research analysis.
 
-> Enterprise-grade AI governance intelligence platform. Board-ready metrics, semantic research discovery, and comprehensive repository analysis across the evolving landscape of AI governance.
-
-[![Vite](https://img.shields.io/badge/Vite-6.3-646CFF?logo=vite)](https://vitejs.dev)
-[![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
+<p align="center">
+  <img src="https://img.shields.io/badge/Vite-6.3-646CFF?logo=vite" alt="Vite" />
+  <img src="https://img.shields.io/badge/React-18.3-61DAFB?logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind-4.1-06B6D4?logo=tailwindcss" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python" alt="Python" />
+  <img src="https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/ChromaDB-0.6-FC6E6E?logo=chroma" alt="ChromaDB" />
+  <img src="https://img.shields.io/badge/Sentence_Transformers-4.1-FF6F00?logo=huggingface" alt="Sentence Transformers" />
+</p>
 
 ---
 
 ## Table of Contents
 
-- [Architecture Overview](#architecture-overview)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Available Scripts](#available-scripts)
-- [API Contract](#api-contract)
-- [Backend Integration Guide](#backend-integration-guide)
+- [Prerequisites](#prerequisites)
+- [Platform Notes](#platform-notes)
+- [Installation](#installation)
 - [Environment Configuration](#environment-configuration)
-- [Deployment](#deployment)
+- [Running Locally](#running-locally)
+- [API Reference](#api-reference)
+- [Data Flow](#data-flow)
+- [Production Build](#production-build)
+- [Docker](#docker)
 - [Contributing](#contributing)
 
 ---
 
-## Architecture Overview
+## Overview
 
-The application is a three-screen single-page application (SPA) built with React and managed via a central state machine:
+**GAI Research Atlas** ingests real-time data from **OpenAlex** (30M+ scholarly works), **GitHub** (repository search), and a curated **governance resources** database to produce a comprehensive intelligence report on any AI governance topic. Results are ranked by a multi-factor scoring algorithm combining semantic relevance, citation impact, recency, and keyword overlap.
+
+The platform is built as a **monorepo** containing a React + TypeScript frontend and a Python + FastAPI backend, communicating over a REST API.
+
+---
+
+## Architecture
 
 ```
-Landing Page ──> Loading Screen ──> Dashboard (Overview)
-     ^                                    │
-     └────────────────────────────────────┘
-            (New Search / Reset)
+┌─────────────────────────────────────────────────────────────────┐
+│                        Frontend (:5173)                         │
+│  ┌──────────┐  ┌──────────┐  ┌───────────────────────────────┐  │
+│  │ Landing  │→ │ Loading  │→ │         Dashboard             │  │
+│  │  Page    │  │  Screen  │  │  ┌─────┐ ┌────┐ ┌─────────┐  │  │
+│  └──────────┘  └──────────┘  │  │Papers│ │Repos│ │Resources│  │  │
+│                               │  └─────┘ └────┘ └─────────┘  │  │
+│                               │  ┌─────────────────────────┐  │  │
+│                               │  │   Knowledge Graph (2D)  │  │  │
+│                               │  └─────────────────────────┘  │  │
+│                               └───────────────────────────────┘  │
+│                                     │                             │
+│                          Vite Proxy │ /api/*                      │
+└─────────────────────────────────────┼───────────────────────────┘
+                                      │
+                              ┌───────▼────────┐
+                              │  FastAPI (:8000)│
+                              │   api_main.py   │
+                              └───────┬────────┘
+                                      │
+                  ┌───────────────────┼────────────────────┐
+                  ▼                   ▼                    ▼
+           ┌────────────┐     ┌──────────────┐     ┌──────────────┐
+           │  OpenAlex   │     │    GitHub    │     │    ChromaDB  │
+           │   (papers)  │     │ (repos)      │     │  (vector DB) │
+           └────────────┘     └──────────────┘     └──────────────┘
+                                         │                 │
+                                         ▼                 ▼
+                                  ┌────────────┐   ┌──────────────┐
+                                  │sentence-    │   │    Local     │
+                                  │transformer  │   │  CSV (govt   │
+                                  │(embeddings) │   │  resources)  │
+                                  └────────────┘   └──────────────┘
 ```
 
-| Screen | Route (conceptual) | Purpose |
-|--------|-------------------|---------|
-| **Landing** | `/` | Topic input, feature showcase, orbit visualization |
-| **Loading** | `/loading` | Animated progress screen with 5-step pipeline status |
-| **Dashboard** | `/dashboard` | Executive overview, paper cards, repository cards, resource links |
+---
 
-State transitions are handled by `App.tsx` using `useState` with three valid states: `'landing' | 'loading' | 'dashboard'`.
+## Features
+
+- **Semantic Paper Discovery** — Real-time search of 30M+ scholarly works via OpenAlex with multi-factor ranking (semantic relevance 65%, citation impact 10%, recency 10%, keyword overlap 15%)
+- **GitHub Repository Intelligence** — Topic-relevant open-source repos ranked by description relevance (60%), keyword overlap (25%), and star score (15%)
+- **Curated Governance Resources** — 47 hand-picked policy frameworks, legislation trackers, certification bodies, and legal databases (IAPP, NIST, EU AI Act, GDPR, etc.)
+- **Knowledge Graph** — Interactive 2D force-directed graph visualizing relationships between topics, papers, repositories, datasets, and models
+- **Board-Ready Metrics Dashboard** — Executive summary with typewriter animation, paper/repo/resource cards with Atlas Scores
+- **Live Embeddings** — Sentence-transformer models generate embeddings on-the-fly for ChromaDB-powered semantic similarity search
 
 ---
 
 ## Tech Stack
 
+### Frontend
+
 | Layer | Technology |
 |-------|-----------|
-| **Framework** | React 18.3 with TypeScript |
+| **Framework** | React 18.3 + TypeScript 5 |
 | **Build Tool** | Vite 6.3 |
 | **Styling** | Tailwind CSS 4.1 + MUI 7.3 |
 | **Animation** | Motion (Framer Motion) 12 |
 | **Icons** | Lucide React + MUI Icons |
-| **Routing** | React Router 7 (available, client-side) |
-| **Data Fetching** | Native `fetch` (via service layer) |
 | **Charts** | Recharts 2 |
-| **DnD** | React DnD |
 | **Package Manager** | pnpm 11 |
+
+### Backend
+
+| Layer | Technology |
+|-------|-----------|
+| **API Framework** | FastAPI 0.115 |
+| **Runtime** | Python 3.13 |
+| **Vector Database** | ChromaDB 0.6 |
+| **Embeddings** | sentence-transformers 4.1 (all-MiniLM-L6-v2) |
+| **Data Sources** | OpenAlex REST API · GitHub Search API · Local CSV |
 
 ---
 
 ## Project Structure
 
 ```
-src/
-├── app/
-│   ├── App.tsx                        # Root component — state machine
-│   ├── components/
-│   │   ├── LandingPage.tsx            # Topic input screen
-│   │   ├── LoadingScreen.tsx          # Animated loading pipeline
-│   │   ├── AtlasDashboard.tsx         # Main dashboard layout
-│   │   ├── OverviewSection.tsx        # Executive summary + metrics
-│   │   ├── PaperCard.tsx              # Individual paper result
-│   │   ├── RepoCard.tsx               # Individual repository result
-│   │   ├── ResourceCard.tsx           # Individual resource link
-│   │   ├── AtlasScoreBadge.tsx        # Score visualization
-│   │   ├── GovernAILogo.tsx           # Brand logo component
-│   │   ├── KnowledgeGraphPlaceholder.tsx
-│   │   └── figma/
-│   │       └── ImageWithFallback.tsx   # Image with error fallback
-│   ├── services/
-│   │   └── atlasApi.ts                # API service layer
-│   └── types/
-│       └── atlas.ts                   # TypeScript interfaces
-├── imports/                           # Static assets
-├── styles/                            # Global CSS, fonts, theme
-└── main.tsx                           # Entry point
+GAI-Research-Atlas/
+├── api_main.py                       # FastAPI entry point (health, atlas, graph endpoints)
+├── app.py                            # Legacy Streamlit entry point (unused)
+├── requirements.txt                  # Python dependencies
+├── package.json                      # Frontend dependencies
+├── pnpm-lock.yaml                    # pnpm lockfile
+├── vite.config.ts                    # Vite config with API proxy
+├── tsconfig.json                     # TypeScript config
+├── .env.example                      # Environment variable template
+├── .gitignore                        # Git ignore rules
+├── README.md                         # This file
+│
+├── services/                         # Python backend services
+│   ├── atlas_service.py              # Orchestrator — generates Atlas from topic
+│   ├── paper_service.py              # OpenAlex paper retrieval
+│   ├── github_service.py             # GitHub repository search
+│   ├── resource_service.py           # Local CSV governance resources
+│   ├── ranking_service.py            # Paper scoring & ranking
+│   ├── scoring_service.py            # Scoring utilities (semantic, citation, recency)
+│   ├── repo_ranking_service.py       # Repository ranking with embeddings
+│   ├── embedding_service.py          # Sentence-transformer embeddings
+│   ├── vector_store.py               # ChromaDB vector store operations
+│   ├── extractor_service.py          # Dataset & model extraction from paper text
+│   ├── search_service.py             # Vector search wrapper
+│   └── graph_service.py              # Knowledge graph node/edge builder
+│
+├── models/                           # Pydantic data models
+│   └── atlas_schema.py               # Paper, Repository, Resource, Atlas schemas
+│
+├── data/
+│   └── governance_resources.csv      # 47 curated AI governance resources
+│
+├── tests/                            # Python test scripts
+│   ├── test_scoring.py
+│   ├── test_atlas.py
+│   ├── test_papers.py
+│   ├── test_github.py
+│   ├── test_resources.py
+│   └── ...                           # Additional test scripts
+│
+├── src/                              # React frontend source
+│   ├── main.tsx                      # Entry point
+│   ├── styles/                       # Global CSS
+│   └── app/
+│       ├── App.tsx                   # Root state machine
+│       ├── types/
+│       │   └── atlas.ts              # TypeScript interfaces
+│       ├── services/
+│       │   └── atlasApi.ts           # API service layer
+│       └── components/
+│           ├── LandingPage.tsx        # Topic input & hero
+│           ├── LoadingScreen.tsx      # Pipeline progress animation
+│           ├── AtlasDashboard.tsx     # Main dashboard layout
+│           ├── OverviewSection.tsx    # Executive summary
+│           ├── PaperCard.tsx          # Paper result card
+│           ├── RepoCard.tsx           # Repository card
+│           ├── ResourceCard.tsx       # Resource link card
+│           ├── KnowledgeGraph.tsx     # Interactive 2D force graph
+│           ├── AtlasScoreBadge.tsx    # Score indicator
+│           ├── GovernAILogo.tsx       # Brand logo
+│           └── figma/
+│               └── ImageWithFallback.tsx
+│
+├── chroma_db/                        # ChromaDB persistence (gitignored)
+└── dist/                             # Production build output (gitignored)
 ```
 
 ---
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+| Tool | Version | Installation |
+|------|---------|-------------|
+| **Node.js** | ≥ 18 | [nodejs.org](https://nodejs.org) |
+| **pnpm** | ≥ 8 | `npm install -g pnpm` |
+| **Python** | ≥ 3.10 | [python.org](https://python.org) |
+| **pip** | (bundled with Python) | — |
 
-- **Node.js** >= 18
-- **pnpm** >= 8 (install: `npm install -g pnpm`)
-- **Python** >= 3.10 (for backend services)
+---
 
-### Installation
+## Platform Notes
+
+### Windows-Specific Packages
+
+This project includes two Windows-native binaries required by Vite:
+
+| Package | Purpose |
+|---------|---------|
+| `@rollup/rollup-win32-x64-msvc` | Native Rollup binary for module bundling |
+| `lightningcss-win32-x64-msvc` | Native LightningCSS binary for CSS processing |
+
+These are listed in `package.json` as **optional dependencies** and are only installed on Windows x64. They do not affect other platforms.
+
+### Other Operating Systems
+
+If you're on **macOS** or **Linux**, these packages are simply skipped during installation. The package manager automatically selects the correct native binaries for your platform (e.g., `@rollup/rollup-linux-x64-gnu` for Linux, `@rollup/rollup-darwin-arm64` for Apple Silicon). No manual action is needed.
+
+### Python Backend
+
+The Python backend is cross-platform. On Windows, ensure:
+- Python is added to your system PATH
+- Long path support is enabled if needed: `git config --system core.longpaths true`
+
+---
+
+## Installation
+
+### 1. Clone the Repository
 
 ```bash
-# Install frontend dependencies
-pnpm install
+git clone https://github.com/Divyakush2006/GAI-Research-Atlas.git
+cd GAI-Research-Atlas
+```
 
-# Install backend dependencies
+### 2. Frontend Dependencies
+
+```bash
+pnpm install
+```
+
+### 3. Backend Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### Development
-
-Start both servers (in separate terminals):
-
-```bash
-# Terminal 1 — Backend API
-uvicorn api_main:app --reload --port 8000
-
-# Terminal 2 — Frontend dev server
-pnpm dev
-```
-
-The Vite dev server runs at `http://localhost:5173` with HMR and proxies `/api/*` to the backend.
-
-### Build
-
-```bash
-pnpm build
-```
-
-Outputs a production build to the `dist/` directory.
+> **Note:** The `sentence-transformers` package downloads a ~80MB model (`all-MiniLM-L6-v2`) on first use. This happens automatically when you make your first API call to `/api/atlas` or `/api/graph`.
 
 ---
 
-## API Contract
+## Environment Configuration
 
-The frontend communicates with the backend via a single POST endpoint.
+### Backend
+
+Copy the environment template and configure your tokens:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GITHUB_TOKEN` | Recommended | GitHub personal access token (avoids 60 req/hr rate limit) |
+| `OPENALEX_EMAIL` | Optional | Email for OpenAlex polite pool (higher rate limits) |
+
+Generate a GitHub token at: [github.com/settings/tokens](https://github.com/settings/tokens) (no scopes needed for public repos).
+
+### Frontend
+
+No frontend environment variables are required for local development. The Vite dev server proxies `/api/*` requests to the backend automatically.
+
+---
+
+## Running Locally
+
+Start both servers in separate terminals.
+
+### Terminal 1 — Backend API Server
+
+```bash
+uvicorn api_main:app --reload --port 8000
+```
+
+The backend starts on `http://localhost:8000`. On first startup, the sentence-transformer model loads (takes 5–15 seconds depending on your internet connection). Subsequent startups are instant.
+
+**Available endpoints:**
+- `GET /health` — Health check
+- `POST /api/atlas` — Generate a Research Atlas
+- `POST /api/graph` — Generate knowledge graph data
+
+### Terminal 2 — Frontend Dev Server
+
+```bash
+pnpm dev
+```
+
+The frontend starts on `http://localhost:5173` with Hot Module Replacement (HMR). API requests to `/api/*` are automatically proxied to `http://localhost:8000` (configured in `vite.config.ts`).
+
+### Verify the Setup
+
+```bash
+# Check backend health
+curl http://localhost:8000/health
+
+# Generate an atlas
+curl -X POST http://localhost:8000/api/atlas \
+  -H "Content-Type: application/json" \
+  -d '{"topic":"AI Governance"}'
+
+# Generate graph data
+curl -X POST http://localhost:8000/api/graph \
+  -H "Content-Type: application/json" \
+  -d '{"topic":"AI Governance"}'
+```
+
+Then open `http://localhost:5173` in your browser, enter a topic, and explore the dashboard.
+
+---
+
+## API Reference
+
+### `GET /health`
+
+Returns the backend health status.
+
+```json
+{
+  "status": "ok"
+}
+```
 
 ### `POST /api/atlas`
 
 Generates a complete Research Atlas for a given topic.
 
-#### Request
+**Request:**
 
 ```json
 {
@@ -152,142 +346,72 @@ Generates a complete Research Atlas for a given topic.
 }
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `topic` | `string` | Yes | Research topic or strategic objective |
-
-#### Response — `200 OK`
+**Response — `200 OK`:**
 
 ```json
 {
   "topic": "AI Governance",
-  "overview": "AI Governance encompasses the frameworks...",
+  "overview": "AI Governance research domain",
   "papers": [
     {
-      "title": "Towards Responsible AI: A Framework...",
-      "authors": ["Sarah Chen", "Marcus Williams"],
+      "title": "The Oxford Handbook of AI Governance",
       "year": 2024,
-      "citation_count": 1240,
-      "score": 94.7,
-      "abstract": "We propose a comprehensive governance framework...",
-      "url": "https://arxiv.org/abs/2401.example1"
+      "authors": ["Justin B. Bullock", "Yu-Che Chen", "et al."],
+      "citation_count": 45,
+      "abstract": "This handbook provides a comprehensive overview...",
+      "score": 86.24,
+      "url": "https://doi.org/10.1093/oxfordhb/9780197579329.001.0001"
     }
   ],
+  "datasets": ["ImageNet", "COCO"],
+  "models": ["BERT", "Transformer"],
   "repositories": [
     {
-      "name": "responsible-ai-toolbox",
-      "description": "Microsoft's suite of tools...",
-      "stars": 4800,
-      "url": "https://github.com/microsoft/responsible-ai-toolbox",
-      "language": "Python"
+      "name": "awesome-ai-governance",
+      "description": "Curated list of AI governance resources",
+      "stars": 1200,
+      "url": "https://github.com/...",
+      "score": 91.86
     }
   ],
   "resources": [
     {
-      "title": "IAPP AI Governance Center",
-      "url": "https://iapp.org/resources/topics/artificial-intelligence/",
-      "organization": "IAPP",
-      "category": "Framework"
+      "title": "AIGP Certification",
+      "category": "Certification",
+      "source": "IAPP",
+      "url": "https://iapp.org/certify/aigp/"
     }
   ]
 }
 ```
 
-#### Response — `4xx/5xx`
+### `POST /api/graph`
+
+Generates knowledge graph node/edge data for a topic. Internally calls the same pipeline as `/api/atlas` and transforms the result into graph format.
+
+**Request:** Same as `/api/atlas`
+
+**Response — `200 OK`:**
 
 ```json
 {
-  "error": "Failed to generate atlas"
+  "nodes": [
+    { "id": "AI Governance", "label": "AI Governance", "type": "topic" },
+    { "id": "The Oxford Handbook...", "label": "The Oxford Handbook...", "type": "paper", "url": "https://..." }
+  ],
+  "edges": [
+    { "source": "AI Governance", "target": "The Oxford Handbook...", "relation": "contains" }
+  ]
 }
 ```
 
-### TypeScript Interfaces
+**Node types:** `topic`, `paper`, `repository`, `dataset`, `model`
 
-```typescript
-interface Paper {
-  title: string;
-  authors?: string[];
-  year: number;
-  citation_count: number;
-  score: number;
-  abstract?: string;
-  url?: string;
-}
-
-interface Repository {
-  name: string;
-  description?: string;
-  stars: number;
-  url: string;
-  language?: string;
-}
-
-interface Resource {
-  title: string;
-  url: string;
-  organization?: string;
-  category?: string;
-}
-
-interface AtlasData {
-  topic: string;
-  overview: string;
-  papers: Paper[];
-  repositories: Repository[];
-  resources: Resource[];
-}
-```
+**Edge relations:** `contains`, `implemented_by`, `uses`, `model`
 
 ---
 
-## Backend Integration
-
-The project includes a **FastAPI wrapper** (`api_main.py`) that exposes the Python backend services as a REST API.
-
-### Architecture
-
-```
-Frontend (Vite :5173)  ──proxy──>  FastAPI (:8000)  ──>  Backend Services
-                                                   │
-                                                   ├── OpenAlex (papers)
-                                                   ├── GitHub (repositories)
-                                                   ├── ChromaDB (vector store)
-                                                   └── sentence-transformers (embeddings)
-```
-
-### Running the Backend
-
-```bash
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Start the FastAPI server
-uvicorn api_main:app --reload --port 8000
-```
-
-The backend API will be available at `http://localhost:8000`.
-
-### Development Proxy
-
-When running `pnpm dev`, Vite automatically proxies `/api/*` requests to `http://localhost:8000` (configured in `vite.config.ts`).
-
-### Production Build
-
-Build the frontend, then serve the `dist/` folder alongside the FastAPI backend:
-
-```bash
-pnpm build
-# Serve dist/ via FastAPI's static files or a reverse proxy like Nginx
-```
-
-### API Endpoint
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/health` | Health check |
-| `POST` | `/api/atlas` | Generate a Research Atlas for a topic |
-
-### Data Flow
+## Data Flow
 
 ```
 User Input (topic)
@@ -297,80 +421,56 @@ POST /api/atlas { topic: "AI Governance" }
     │
     ▼
 AtlasService.generate_atlas(topic)
-    ├── PaperService.get_papers()      → OpenAlex API
-    ├── VectorStore.add_paper()        → ChromaDB
-    ├── RankingService.rank_papers()   → Semantic + Citation + Recency scoring
-    ├── GitHubService.get_repositories() → GitHub API
-    └── ResourceService.get_resources() → Local CSV
+    │
+    ├── PaperService.get_papers()
+    │     └── OpenAlex API → papers[]
+    │
+    ├── VectorStore.add_paper() (for each paper)
+    │     └── ChromaDB persistent storage
+    │
+    ├── RankingService.rank_papers()
+    │     └── ChromaDB semantic search + citation/recency/overlap scoring
+    │
+    ├── GitHubService.get_repositories()
+    │     └── GitHub Search API → repositories[]
+    │
+    ├── RepoRankingService.rank_repositories()
+    │     └── Embedding similarity + keyword overlap + star score
+    │
+    ├── ResourceService.get_resources()
+    │     └── Local CSV → resources[]
+    │
+    ├── ExtractorService.extract_datasets() / extract_models()
+    │     └── Keyword matching in paper titles/abstracts
+    │
+    └── Results capped: 10 papers, 5 repos, 10 resources
     │
     ▼
-Response: Atlas (topic, overview, papers[], repositories[], resources[])
-```
-
-The dashboard section expects:
-
-| Section | Data Source | Display |
-|---------|------------|---------|
-| **Executive Summary** | `atlas.overview` | Typewriter-animated paragraph |
-| **Board Metrics** | Hardcoded (Risk Exposure, Regulatory Readiness, Governance Posture) | Static stat cards |
-| **Papers** | `atlas.papers[]` | Scored, ranked list with citation counts |
-| **Repositories** | `atlas.repositories[]` | Card grid with star counts |
-| **Resources** | `atlas.resources[]` | Link list with organization/category |
-| **Knowledge Graph** | Placeholder | Locked in sidebar (coming soon) |
-
-### 4. Scoring Requirement
-
-The `papers[].score` field (0–100) drives the Atlas Score badge color:
-
-| Range | Color |
-|-------|-------|
-| 90–100 | Green (excellent) |
-| 70–89 | Orange (strong) |
-| 50–69 | Amber (moderate) |
-| 0–49 | Red (limited) |
-
----
-
-## Environment Configuration
-
-Vite uses environment variables prefixed with `VITE_`. Create a `.env` file in the project root:
-
-```env
-# API base URL (defaults to same-origin if unset)
-VITE_API_BASE_URL=https://api.example.com
-
-# Optional: timeout in milliseconds for API requests
-VITE_API_TIMEOUT=30000
-```
-
-For development behind a backend proxy, configure `vite.config.ts`:
-
-```typescript
-export default defineConfig({
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-    },
-  },
-});
+Response → Frontend renders dashboard
 ```
 
 ---
 
-## Deployment
-
-### Build
+## Production Build
 
 ```bash
+# Build the frontend
 pnpm build
+
+# Output: dist/ directory with static files
 ```
 
-The output is written to `dist/`. Serve it with any static file server (Nginx, Caddy, Cloudflare Pages, Vercel, etc.)
+For production deployment, serve the `dist/` folder alongside the FastAPI backend. This can be done via:
 
-### Docker
+- **Nginx reverse proxy** — Serve static files and proxy `/api/` to FastAPI
+- **FastAPI static files** — Mount `dist/` as a static directory in `api_main.py`
+- **Cloud deployment** — Deploy frontend to Vercel/Netlify/Cloudflare Pages and backend to a Python host (Railway, Render, fly.io)
+
+---
+
+## Docker
+
+### Frontend
 
 ```dockerfile
 FROM node:22-alpine AS builder
@@ -384,6 +484,18 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
+```
+
+### Backend
+
+```dockerfile
+FROM python:3.13-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["uvicorn", "api_main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ---
@@ -400,16 +512,22 @@ CMD ["nginx", "-g", "daemon off;"]
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-- `feat:` — new feature
-- `fix:` — bug fix
-- `docs:` — documentation
-- `chore:` — maintenance
-- `refactor:` — code restructuring
+| Prefix | Usage |
+|--------|-------|
+| `feat:` | New feature |
+| `fix:` | Bug fix |
+| `docs:` | Documentation |
+| `chore:` | Maintenance |
+| `refactor:` | Code restructuring |
+| `perf:` | Performance improvement |
+| `ci:` | CI/CD changes |
 
 ---
 
 <div align="center">
   <sub>© 2026 GAI Research Atlas. All rights reserved.</sub>
   <br/>
-  <sub>Developed with ❤️ by <a href="https://github.com/Divyakush2006">Divyakush2006</a></sub>
+  <sub>Built with ❤️ by <a href="https://github.com/Divyakush2006">Divyakush2006</a></sub>
+  <br/>
+  <sub>Powered by OpenAlex, GitHub, ChromaDB, and sentence-transformers</sub>
 </div>

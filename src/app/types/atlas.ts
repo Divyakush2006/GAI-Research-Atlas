@@ -27,6 +27,8 @@ export interface AtlasData {
   topic: string;
   overview: string;
   papers: Paper[];
+  datasets: string[];
+  models: string[];
   repositories: Repository[];
   resources: Resource[];
 }
@@ -38,4 +40,22 @@ export interface LoadingStep {
   label: string;
   sublabel: string;
   status: 'pending' | 'active' | 'complete';
+}
+
+export interface GraphNode {
+  id: string;
+  label: string;
+  type: 'topic' | 'paper' | 'repository' | 'dataset' | 'model';
+  url?: string;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  relation: string;
+}
+
+export interface GraphData {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
 }

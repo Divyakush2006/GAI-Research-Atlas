@@ -7,17 +7,17 @@ import {
   Globe,
   Network,
   ArrowLeft,
-  Lock,
   ChevronRight,
 } from 'lucide-react';
 import { OverviewSection } from './OverviewSection';
 import { PaperCard } from './PaperCard';
 import { RepoCard } from './RepoCard';
 import { ResourceCard } from './ResourceCard';
-import { KnowledgeGraphPlaceholder } from './KnowledgeGraphPlaceholder';
+import { KnowledgeGraph } from './KnowledgeGraph';
 import type { AtlasData } from '../types/atlas';
 import { GovernAILogo } from './GovernAILogo';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { buildGraphFromAtlas } from '../services/atlasApi';
 import dashLogo from '../../imports/image-removebg-preview.png';
 
 type Section = 'overview' | 'papers' | 'repositories' | 'resources' | 'graph';
@@ -26,7 +26,6 @@ const NAV_ITEMS: {
   id: Section;
   label: string;
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
-  locked?: boolean;
 }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'papers', label: 'Papers', icon: FileText },
@@ -43,6 +42,7 @@ interface AtlasDashboardProps {
 export function AtlasDashboard({ atlas, onReset }: AtlasDashboardProps) {
   const [activeSection, setActiveSection] = useState<Section>('overview');
   const mainRef = useRef<HTMLDivElement>(null);
+  const graphData = useRef(buildGraphFromAtlas(atlas)).current;
 
   const navigate = (section: Section) => {
     setActiveSection(section);
@@ -84,36 +84,33 @@ export function AtlasDashboard({ atlas, onReset }: AtlasDashboardProps) {
           <p className="text-xs font-semibold uppercase tracking-widest text-[#B0A99F] mb-3 px-2">Navigation</p>
           {NAV_ITEMS.map((item) => {
             const isActive = activeSection === item.id;
-            const isLocked = item.id === 'graph';
 
             return (
               <button
                 key={item.id}
-                onClick={() => !isLocked && navigate(item.id)}
+                onClick={() => navigate(item.id)}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 group"
                 style={{
                   background: isActive ? '#FFF4EC' : 'transparent',
                   border: isActive ? '1px solid #F5D4C0' : '1px solid transparent',
-                  cursor: isLocked ? 'default' : 'pointer',
+                  cursor: 'pointer',
                 }}
               >
                 <item.icon
                   className="w-4 h-4 flex-shrink-0 transition-colors"
                   style={{
-                    color: isActive ? '#F16A24' : isLocked ? '#D5CFC6' : '#7A7169',
+                    color: isActive ? '#F16A24' : '#7A7169',
                   }}
                 />
                 <span
                   className="text-sm font-medium flex-1 transition-colors"
                   style={{
-                    color: isActive ? '#F16A24' : isLocked ? '#D5CFC6' : '#3D3730',
+                    color: isActive ? '#F16A24' : '#3D3730',
                   }}
                 >
                   {item.label}
                 </span>
-                {isLocked ? (
-                  <Lock className="w-3 h-3 text-[#D5CFC6]" />
-                ) : isActive ? (
+                {isActive ? (
                   <ChevronRight className="w-3.5 h-3.5" style={{ color: '#F16A24' }} />
                 ) : null}
               </button>
@@ -232,12 +229,12 @@ export function AtlasDashboard({ atlas, onReset }: AtlasDashboardProps) {
             )}
 
             {activeSection === 'graph' && (
-              <div className="max-w-3xl">
+              <div className="w-full">
                 <div className="mb-6">
                   <h2 className="font-bold text-[#0D0D0D]">Knowledge Graph</h2>
                   <p className="text-sm text-[#7A7169] mt-0.5">Visual map of research relationships for this topic</p>
                 </div>
-                <KnowledgeGraphPlaceholder topic={atlas.topic} />
+                <KnowledgeGraph topic={atlas.topic} data={graphData} />
               </div>
             )}
           </motion.div>

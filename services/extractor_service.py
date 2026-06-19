@@ -1,15 +1,15 @@
-import re
 from typing import List, Set
 from models.atlas_schema import Paper
-from services.config import logger
+
 
 class ExtractorService:
+
     DATASETS = [
         "FaceForensics++",
         "CelebDF",
         "DFDC",
         "ImageNet",
-        "COCO",
+        "COCO"
     ]
 
     MODELS = [
@@ -20,31 +20,46 @@ class ExtractorService:
         "ViT",
         "BERT",
         "GPT",
-        "Transformer",
+        "Transformer"
     ]
 
     @staticmethod
     def extract_datasets(papers: List[Paper]) -> List[str]:
+
         found: Set[str] = set()
+
         for paper in papers:
-            text = f"{paper.title} {paper.abstract}"
+
+            
+            text = (
+               paper.title +
+               " " +
+               paper.abstract
+            ).lower()
+
             for dataset in ExtractorService.DATASETS:
-                if re.search(rf"\b{re.escape(dataset)}\b", text, re.IGNORECASE):
+
+                if dataset.lower() in text:
                     found.add(dataset)
-        result = sorted(found)
-        if result:
-            logger.info(f"Extracted datasets: {result}")
-        return result
+
+        return sorted(list(found))
 
     @staticmethod
     def extract_models(papers: List[Paper]) -> List[str]:
+
         found: Set[str] = set()
+
         for paper in papers:
-            text = f"{paper.title} {paper.abstract}"
+
+            text = (
+               paper.title +
+               " " +
+               paper.abstract
+            ).lower()
+
             for model in ExtractorService.MODELS:
-                if re.search(rf"\b{re.escape(model)}\b", text, re.IGNORECASE):
+
+                if model.lower() in text:
                     found.add(model)
-        result = sorted(found)
-        if result:
-            logger.info(f"Extracted models: {result}")
-        return result
+
+        return sorted(list(found))

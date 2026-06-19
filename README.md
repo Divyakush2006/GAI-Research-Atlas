@@ -61,24 +61,24 @@ The platform is built as a **monorepo** containing a React + TypeScript frontend
 │                          Vite Proxy │ /api/*                      │
 └─────────────────────────────────────┼───────────────────────────┘
                                       │
-                              ┌───────▼────────┐
-                              │  FastAPI (:8000)│
-                              │   api_main.py   │
-                              └───────┬────────┘
-                                      │
-                  ┌───────────────────┼────────────────────┐
-                  ▼                   ▼                    ▼
-           ┌────────────┐     ┌──────────────┐     ┌──────────────┐
-           │  OpenAlex   │     │    GitHub    │     │    ChromaDB  │
-           │   (papers)  │     │ (repos)      │     │  (vector DB) │
-           └────────────┘     └──────────────┘     └──────────────┘
+                               ┌────────────────┐
+                               │  FastAPI (:8000)│
+                               │   api_main.py   │
+                               └───────┬────────┘
+                                       │
+                   ┌───────────────────┼────────────────────┐
+                   ▼                   ▼                    ▼
+            ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
+            │   OpenAlex   │   │    GitHub    │   │   ChromaDB   │
+            │   (papers)   │   │  (repos)     │   │ (vector DB)  │
+            └──────────────┘   └──────────────┘   └──────────────┘
                                          │                 │
                                          ▼                 ▼
-                                  ┌────────────┐   ┌──────────────┐
-                                  │sentence-    │   │    Local     │
-                                  │transformer  │   │  CSV (govt   │
-                                  │(embeddings) │   │  resources)  │
-                                  └────────────┘   └──────────────┘
+                                   ┌──────────────┐ ┌──────────────────┐
+                                   │sentence-     │ │     Local        │
+                                   │transformers  │ │  CSV (govt       │
+                                   │(embeddings)  │ │  resources)      │
+                                   └──────────────┘ └──────────────────┘
 ```
 
 ---
@@ -143,7 +143,7 @@ GAI-Research-Atlas/
 │   ├── ranking_service.py            # Paper scoring & ranking
 │   ├── scoring_service.py            # Scoring utilities (semantic, citation, recency)
 │   ├── repo_ranking_service.py       # Repository ranking with embeddings
-│   ├── embedding_service.py          # Sentence-transformer embeddings
+│   ├── embedding_service.py          # sentence-transformers embeddings
 │   ├── vector_store.py               # ChromaDB vector store operations
 │   ├── extractor_service.py          # Dataset & model extraction from paper text
 │   ├── search_service.py             # Vector search wrapper
@@ -286,7 +286,7 @@ Start both servers in separate terminals.
 uvicorn api_main:app --reload --port 8000
 ```
 
-The backend starts on `http://localhost:8000`. On first startup, the sentence-transformer model loads (takes 5–15 seconds depending on your internet connection). Subsequent startups are instant.
+The backend starts on `http://localhost:8000`. On first startup, the sentence-transformers model loads (takes 5–15 seconds depending on your internet connection). Subsequent startups are instant.
 
 **Available endpoints:**
 - `GET /health` — Health check

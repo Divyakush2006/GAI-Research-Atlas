@@ -100,20 +100,31 @@ src/
 
 - **Node.js** >= 18
 - **pnpm** >= 8 (install: `npm install -g pnpm`)
+- **Python** >= 3.10 (for backend services)
 
 ### Installation
 
 ```bash
+# Install frontend dependencies
 pnpm install
+
+# Install backend dependencies
+pip install -r requirements.txt
 ```
 
 ### Development
 
+Start both servers (in separate terminals):
+
 ```bash
+# Terminal 1 — Backend API
+uvicorn api_main:app --reload --port 8000
+
+# Terminal 2 — Frontend dev server
 pnpm dev
 ```
 
-Starts the Vite dev server at `http://localhost:5173` with HMR.
+The Vite dev server runs at `http://localhost:5173` with HMR and proxies `/api/*` to the backend.
 
 ### Build
 
@@ -229,45 +240,72 @@ interface AtlasData {
 
 ---
 
-## Backend Integration Guide
+## Backend Integration
 
-### 1. Implement the Endpoint
+The project includes a **FastAPI wrapper** (`api_main.py`) that exposes the Python backend services as a REST API.
 
-The frontend expects a backend that:
+### Architecture
 
-- Listens on the same origin (or configure a proxy — see [Environment Configuration](#environment-configuration))
-- Accepts `POST /api/atlas` with `Content-Type: application/json`
-- Returns a JSON body conforming to `AtlasData`
-
-### 2. Connect the Frontend
-
-In `src/app/services/atlasApi.ts`, replace the mock implementation:
-
-```typescript
-// BEFORE — Mock implementation used for development
-export async function generateAtlas(topic: string): Promise<AtlasData> {
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-  return buildMockAtlas(topic);
-}
-
-// AFTER — Real backend integration
-export async function generateAtlas(topic: string): Promise<AtlasData> {
-  const response = await fetch('/api/atlas', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ topic }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || `Request failed: ${response.statusText}`);
-  }
-
-  return response.json();
-}
+```
+Frontend (Vite :5173)  ──proxy──>  FastAPI (:8000)  ──>  Backend Services
+                                                   │
+                                                   ├── OpenAlex (papers)
+                                                   ├── GitHub (repositories)
+                                                   ├── ChromaDB (vector store)
+                                                   └── sentence-transformers (embeddings)
 ```
 
-### 3. Backend Implementation Guidelines
+### Running the Backend
+
+```bash
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Start the FastAPI server
+uvicorn api_main:app --reload --port 8000
+```
+
+The backend API will be available at `http://localhost:8000`.
+
+### Development Proxy
+
+When running `pnpm dev`, Vite automatically proxies `/api/*` requests to `http://localhost:8000` (configured in `vite.config.ts`).
+
+### Production Build
+
+Build the frontend, then serve the `dist/` folder alongside the FastAPI backend:
+
+```bash
+pnpm build
+# Serve dist/ via FastAPI's static files or a reverse proxy like Nginx
+```
+
+### API Endpoint
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/health` | Health check |
+| `POST` | `/api/atlas` | Generate a Research Atlas for a topic |
+
+### Data Flow
+
+```
+User Input (topic)
+    │
+    ▼
+POST /api/atlas { topic: "AI Governance" }
+    │
+    ▼
+AtlasService.generate_atlas(topic)
+    ├── PaperService.get_papers()      → OpenAlex API
+    ├── VectorStore.add_paper()        → ChromaDB
+    ├── RankingService.rank_papers()   → Semantic + Citation + Recency scoring
+    ├── GitHubService.get_repositories() → GitHub API
+    └── ResourceService.get_resources() → Local CSV
+    │
+    ▼
+Response: Atlas (topic, overview, papers[], repositories[], resources[])
+```
 
 The dashboard section expects:
 

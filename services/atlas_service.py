@@ -1,42 +1,85 @@
 from models.atlas_schema import Atlas
+from services.vector_store import VectorStore
+
+
 from services.paper_service import PaperService
 from services.github_service import GitHubService
 from services.resource_service import ResourceService
 from services.extractor_service import ExtractorService
+from services.repo_ranking_service import RepoRankingService
+
+
 from services.ranking_service import RankingService
-from services.config import logger
 
 class AtlasService:
+
     @staticmethod
     def generate_atlas(topic: str) -> Atlas:
-        topic = topic.strip()
-        if not topic:
-            raise ValueError("Topic must not be empty")
-        if len(topic) > 500:
-            raise ValueError("Topic must not exceed 500 characters")
 
-        logger.info(f"Generating atlas for topic: '{topic}'")
 
+        VectorStore.reset_collection()
+
+        # Fetch papers
         papers = PaperService.get_papers(topic)
-        for paper in papers:
-            pass
 
-        papers = RankingService.rank_papers(topic, papers)
-        repositories = GitHubService.get_repositories(topic)
+        #store papers in vector store
+        for paper in papers:
+          VectorStore.add_paper(paper)
+
+        papers = RankingService.rank_papers(
+         topic,
+          papers
+        )
+
+        # Fetch GitHub repositories
+        repositories = GitHubService.get_repositories(
+            topic
+        )
+     
+        repositories = GitHubService.get_repositories(
+    topic
+)
+
+        repositories = (
+         RepoRankingService.rank_repositories(
+         topic,
+         repositories
+      )
+    )
+
+        # Fetch trusted governance resources
         resources = ResourceService.get_resources()
 
-        datasets = ExtractorService.extract_datasets(papers)
-        models = ExtractorService.extract_models(papers)
+        # Extract datasets and models
+        datasets = ExtractorService.extract_datasets(
+            papers
+        )
 
+        models = ExtractorService.extract_models(
+            papers
+        )
+
+        # Limit results to avoid information overload
+        papers = papers[:10]
+
+        repositories = repositories[:5]
+
+        resources = resources[:10]
+
+        # Build Atlas
         atlas = Atlas(
             topic=topic,
             overview=f"{topic} research domain",
-            papers=papers[:10],
+
+            papers=papers,
+
             datasets=datasets,
+
             models=models,
-            repositories=repositories[:5],
-            resources=resources[:10],
+
+            repositories=repositories,
+
+            resources=resources
         )
 
-        logger.info(f"Atlas generated: {len(atlas.papers)} papers, {len(atlas.repositories)} repos, {len(atlas.resources)} resources")
         return atlas

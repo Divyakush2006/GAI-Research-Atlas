@@ -48,7 +48,7 @@ function GovernanceOrbit() {
       <div className="relative z-10 w-[min(90vw,600px)] aspect-square flex items-center justify-center scale-75 lg:scale-90 xl:scale-100 origin-center">
         {/* Core Node */}
         <div className="absolute w-24 h-24 rounded-full bg-white shadow-[0_0_40px_rgba(241,106,36,0.3)] border border-[#E8E3DC] flex items-center justify-center z-20">
-          <Network className="w-10 h-10" style={{ color: '#F16A24' }} />
+          <GovernAILogo className="w-14 h-14" />
         </div>
         
         {/* Orbit 1 */}

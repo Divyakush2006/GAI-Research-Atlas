@@ -17,6 +17,8 @@ import { ResourceCard } from './ResourceCard';
 import { KnowledgeGraphPlaceholder } from './KnowledgeGraphPlaceholder';
 import type { AtlasData } from '../types/atlas';
 import { GovernAILogo } from './GovernAILogo';
+import { ImageWithFallback } from './figma/ImageWithFallback';
+import dashLogo from '../../imports/image-removebg-preview.png';
 
 type Section = 'overview' | 'papers' | 'repositories' | 'resources' | 'graph';
 
@@ -59,7 +61,11 @@ export function AtlasDashboard({ atlas, onReset }: AtlasDashboardProps) {
         {/* Logo */}
         <div className="px-5 py-5 border-b border-[#E8E3DC]">
           <div className="flex items-center gap-2.5 mb-4">
-            <GovernAILogo className="h-8 w-auto" />
+            <ImageWithFallback 
+              src={dashLogo} 
+              alt="Research Atlas Logo" 
+              className="h-8 w-auto object-contain"
+            />
             <div className="flex items-center gap-1">
               <span className="font-semibold text-sm text-[#0D0D0D]">Research</span>
               <span className="font-semibold text-sm" style={{ color: '#F16A24' }}>Atlas</span>

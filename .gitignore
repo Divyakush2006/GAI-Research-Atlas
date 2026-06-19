@@ -1,3 +1,49 @@
-node_modules/
+# Virtual Environment
+venv/
+.venv/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ChromaDB
+chroma_db/
+
+# Environment Variables
+.env
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Build Files
+build/
 dist/
+*.egg-info/
+
+# Python Testing
+.pytest_cache/
+
+# Coverage Reports
+.coverage
+htmlcov/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Model Caches
+.cache/
+huggingface/
+
+# Node
+node_modules/
 .vite/

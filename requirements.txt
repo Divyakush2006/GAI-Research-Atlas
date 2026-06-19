@@ -1,0 +1,9 @@
+streamlit
+requests
+pydantic
+networkx
+pyvis
+pandas
+chromadb
+sentence-transformers
+torch

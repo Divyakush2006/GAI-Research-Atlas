@@ -153,7 +153,7 @@ GAI-Research-Atlas/
 
 **Divyakush Punjabi** — B.Tech CSE @ VIT Vellore · AI Major @ IIT Ropar · built on behalf of **GovernAI**
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/divyakush-punjabi)
-[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=flat&logo=googlechrome&logoColor=white)](https://divyakush.is-a.dev)
+[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=flat&logo=googlechrome&logoColor=white)](https://www.divyakush.com)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/divyakush2006)
 
 <div align="center"><sub>⭐ Star the repo if you find it useful.</sub></div>

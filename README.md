@@ -1,17 +1,22 @@
+<div align="center">
+
 # GovernAI Research Atlas
 
-> Enterprise-grade AI governance intelligence platform — semantic discovery of papers, open-source repositories, and trusted regulatory resources. Built for board-ready reporting and deep research analysis.
+**Semantic discovery for AI-governance research: ranked papers, open-source repositories and trusted regulatory resources for any topic, in one board-ready report.**
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Vite-6.3-646CFF?logo=vite" alt="Vite" />
-  <img src="https://img.shields.io/badge/React-18.3-61DAFB?logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Tailwind-4.1-06B6D4?logo=tailwindcss" alt="Tailwind" />
-  <img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python" alt="Python" />
-  <img src="https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/ChromaDB-0.6-FC6E6E?logo=chroma" alt="ChromaDB" />
-  <img src="https://img.shields.io/badge/Sentence_Transformers-4.1-FF6F00?logo=huggingface" alt="Sentence Transformers" />
-</p>
+[![License: Apache 2.0](https://img.shields.io/github/license/Divyakush2006/GAI-Research-Atlas?color=blue)](LICENSE)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-6.3-646CFF?logo=vite&logoColor=white)](https://vite.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://www.python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![ChromaDB](https://img.shields.io/badge/ChromaDB-0.5-FC6E6E)](https://www.trychroma.com)
+[![Sentence Transformers](https://img.shields.io/badge/sentence--transformers-3-FF6F00?logo=huggingface&logoColor=white)](https://www.sbert.net)
+
+[Project write-up](https://www.divyakush.com/projects/governai-research-atlas) · [Report a bug](https://github.com/Divyakush2006/GAI-Research-Atlas/issues/new/choose) · [Request a feature](https://github.com/Divyakush2006/GAI-Research-Atlas/issues/new/choose)
+
+</div>
 
 ---
 
@@ -31,7 +36,9 @@
 - [Data Flow](#data-flow)
 - [Production Build](#production-build)
 - [Docker](#docker)
+- [Testing](#testing)
 - [Contributing](#contributing)
+- [License](#license)
 
 ---
 
@@ -112,10 +119,10 @@ The platform is built as a **monorepo** containing a React + TypeScript frontend
 
 | Layer | Technology |
 |-------|-----------|
-| **API Framework** | FastAPI 0.115 |
-| **Runtime** | Python 3.13 |
-| **Vector Database** | ChromaDB 0.6 |
-| **Embeddings** | sentence-transformers 4.1 (all-MiniLM-L6-v2) |
+| **API Framework** | FastAPI 0.111 |
+| **Runtime** | Python 3.10+ |
+| **Vector Database** | ChromaDB 0.5 |
+| **Embeddings** | sentence-transformers 3 (all-MiniLM-L6-v2) |
 | **Data Sources** | OpenAlex REST API · GitHub Search API · Local CSV |
 
 ---
@@ -123,7 +130,7 @@ The platform is built as a **monorepo** containing a React + TypeScript frontend
 ## Project Structure
 
 ```
-GovernAI-Research-Atlas/
+GAI-Research-Atlas/
 ├── api_main.py                       # FastAPI entry point (health, atlas, graph endpoints)
 ├── app.py                            # Legacy Streamlit entry point (unused)
 ├── requirements.txt                  # Python dependencies
@@ -233,8 +240,8 @@ The Python backend is cross-platform. On Windows, ensure:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Divyakush2006/GovernAI-Research-Atlas.git
-cd GovernAI-Research-Atlas
+git clone https://github.com/Divyakush2006/GAI-Research-Atlas.git
+cd GAI-Research-Atlas
 ```
 
 ### 2. Frontend Dependencies
@@ -464,11 +471,13 @@ For production deployment, serve the `dist/` folder alongside the FastAPI backen
 
 - **Nginx reverse proxy** — Serve static files and proxy `/api/` to FastAPI
 - **FastAPI static files** — Mount `dist/` as a static directory in `api_main.py`
-- **Cloud deployment** — Deploy frontend to Vercel/Netlify/Cloudflare Pages and backend to a Python host (Railway, Render, fly.io)
+- **Cloud deployment** — Deploy the frontend to a static host such as Cloudflare Pages and the backend to a Python host (Railway, Render, Fly.io)
 
 ---
 
 ## Docker
+
+The repository does not ship Dockerfiles; these are reference configurations for containerising each tier.
 
 ### Frontend
 
@@ -500,34 +509,32 @@ CMD ["uvicorn", "api_main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ---
 
-## Contributing
+## Testing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Commit changes: `git commit -m 'feat: add my feature'`
-4. Push: `git push origin feature/my-feature`
-5. Open a pull request
+Backend unit tests live in `tests/`:
 
-### Commit Convention
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-| Prefix | Usage |
-|--------|-------|
-| `feat:` | New feature |
-| `fix:` | Bug fix |
-| `docs:` | Documentation |
-| `chore:` | Maintenance |
-| `refactor:` | Code restructuring |
-| `perf:` | Performance improvement |
-| `ci:` | CI/CD changes |
+```bash
+pip install -r test-requirements.txt
+pytest
+```
 
 ---
 
-<div align="center">
-  <sub>© 2026 GovernAI Research Atlas. All rights reserved.</sub>
-  <br/>
-  <sub>Built with ❤️ by <a href="https://github.com/Divyakush2006">Divyakush2006</a></sub>
-  <br/>
-  <sub>Powered by OpenAlex, GitHub, ChromaDB, and sentence-transformers</sub>
-</div>
+## Contributing
+
+Contributions are welcome. Please read the [contributing guide](https://github.com/Divyakush2006/.github/blob/main/CONTRIBUTING.md) before opening a pull request. Commits follow [Conventional Commits](https://www.conventionalcommits.org/).
+
+## Security
+
+Please report vulnerabilities privately as described in the [security policy](https://github.com/Divyakush2006/.github/blob/main/SECURITY.md). Do not open a public issue.
+
+## License
+
+Released under the [Apache License 2.0](LICENSE).
+
+## Authors
+
+- **Divyakush Punjabi** · [www.divyakush.com](https://www.divyakush.com) · [GitHub](https://github.com/Divyakush2006) · [LinkedIn](https://linkedin.com/in/divyakush-punjabi)
+- **Tanya Rastogi**: initial Research Atlas MVP
+
+<div align="center"><sub>Powered by OpenAlex, GitHub, ChromaDB and sentence-transformers.</sub></div>
